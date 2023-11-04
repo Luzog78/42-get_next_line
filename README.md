@@ -16,7 +16,7 @@ Version: `release1.0`
 
 <br>
 
-**Implemented :** [X] 
+- [X] : **Implemented.**
 
 ---
 
@@ -26,7 +26,7 @@ Version: `release1.0`
 
 <br>
 
-**Implemented :** [X]
+- [X] : **Implemented.**
 
 ---
 
