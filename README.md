@@ -1,4 +1,4 @@
-# 42's Get Next Line
+# 42's get_next_line
 
 <br>
 

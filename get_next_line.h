@@ -6,7 +6,7 @@
 /*   By: ysabik <ysabik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 06:59:36 by ysabik            #+#    #+#             */
-/*   Updated: 2023/11/04 09:59:36 by ysabik           ###   ########.fr       */
+/*   Updated: 2023/11/05 02:51:19 by ysabik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,9 @@
 # endif
 
 char	*get_next_line(int fd);
+
+int		ft_read_line(int fd, char **global_buffer, char **buff_line);
+char	*ft_get_final_line(char **buffer);
 
 size_t	ft_strlen(char *str);
 int		ft_str_contains(char *str, char c);

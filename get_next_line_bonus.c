@@ -6,27 +6,64 @@
 /*   By: ysabik <ysabik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 06:59:39 by ysabik            #+#    #+#             */
-/*   Updated: 2023/11/04 11:20:21 by ysabik           ###   ########.fr       */
+/*   Updated: 2023/11/05 01:46:07 by ysabik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-//#define BUFFER_SIZE 42
-
-size_t	ft_strlen(char *str)
+char	*get_next_line(int fd)
 {
-	size_t	len;
+	static t_list	*global_buffers;
+	char			*buff_line;
+	size_t			i;
 
-	if (!str)
-		return (0);
-	len = 0;
-	while (str[len])
-		len++;
-	return (len);
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	buff_line = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buff_line)
+		return (NULL);
+	i = 0;
+	while (i <= BUFFER_SIZE)
+	{
+		buff_line[i] = '\0';
+		i++;
+	}
+	if (!ft_read_line(fd, &global_buffers, &buff_line)
+		|| !ft_get_buff(fd, &global_buffers)->str)
+	{
+		ft_free_buff(fd, &global_buffers);
+		return (NULL);
+	}
+	return (ft_get_final_line(fd, &global_buffers));
 }
 
-static char	*ft_get_final_line(int fd, t_list **global_buffers)
+int	ft_read_line(int fd, t_list **global_buffer, char **buff_line)
+{
+	int		result;
+	t_list	*buff;
+
+	result = 1;
+	buff = ft_get_buff(fd, global_buffer);
+	while (!ft_str_contains(buff->str, '\n'))
+	{
+		result = read(fd, *buff_line, BUFFER_SIZE);
+		if (result < 0)
+		{
+			free(*buff_line);
+			ft_free_buff(fd, global_buffer);
+			return (0);
+		}
+		if (result == 0)
+			break ;
+		(*buff_line)[result] = '\0';
+		buff->str = ft_realloc_join(buff->str, *buff_line);
+	}
+	free(*buff_line);
+	return (1);
+}
+
+char	*ft_get_final_line(int fd, t_list **global_buffers)
 {
 	char	*final_line;
 	t_list	*buff;
@@ -55,71 +92,14 @@ static char	*ft_get_final_line(int fd, t_list **global_buffers)
 	return (final_line);
 }
 
-static int	ft_read_line(int fd, t_list **global_buffer, char **buff_line)
+size_t	ft_strlen(char *str)
 {
-	int		result;
-	t_list	*buff;
+	size_t	len;
 
-	result = 1;
-	buff = ft_get_buff(fd, global_buffer);
-	while (!ft_str_contains(buff->str, '\n'))
-	{
-		result = read(fd, *buff_line, BUFFER_SIZE);
-		if (result < 0)
-		{
-			free(*buff_line);
-			ft_free_buff(fd, global_buffer);
-			return (0);
-		}
-		if (result == 0)
-			break ;
-		(*buff_line)[result] = '\0';
-		buff->str = ft_realloc_join(buff->str, *buff_line);
-	}
-	free(*buff_line);
-	return (1);
+	if (!str)
+		return (0);
+	len = 0;
+	while (str[len])
+		len++;
+	return (len);
 }
-
-char	*get_next_line(int fd)
-{
-	static t_list	*global_buffers;
-	char			*buff_line;
-	size_t			i;
-
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	buff_line = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!buff_line)
-		return (NULL);
-	i = 0;
-	while (i <= BUFFER_SIZE)
-	{
-		buff_line[i] = '\0';
-		i++;
-	}
-	if (!ft_read_line(fd, &global_buffers, &buff_line)
-		|| !ft_get_buff(fd, &global_buffers)->str)
-	{
-		ft_free_buff(fd, &global_buffers);
-		return (NULL);
-	}
-	return (ft_get_final_line(fd, &global_buffers));
-}
-
-/*int	main(void)
-{
-	int		fd;
-	char	*line;
-
-	printf("--------------------\n");
-	fd = open("test.txt", O_RDONLY);
-	line = get_next_line(fd);
-	printf("%s\n", line);
-	line = get_next_line(fd);
-	printf("%p\n", line);
-	line = get_next_line(fd);
-	printf("%p\n", line);
-	line = get_next_line(fd);
-	printf("%p\n", line);
-	printf("--------------------\n");
-}*/
